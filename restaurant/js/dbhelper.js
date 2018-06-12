@@ -1,3 +1,26 @@
+/* creating idb const/variables */
+
+const DBNAME = 'mws-stage2';
+const KEY = 'restaurants';
+const DBVER = 1;
+
+(function() {
+  'use strict';
+
+  //check for support
+  if (!('indexedDB' in window)) {
+    console.log('This browser doesn\'t support IndexedDB');
+    return;
+  }
+
+  var dbPromise = idb.open(DBNAME, DBVER, function (upgradeDb) {
+    if (!upgradeDb.objectStoreNames.contains(KEY)) {
+      upgradeDb.createObjectStore(KEY, { keyPath: 'id' });
+    }
+  });
+
+})();
+
 /**
  * Common database helper functions.
  */
@@ -8,15 +31,32 @@ class DBHelper {
    * Change this to restaurants.json file location on your server.
    */
   static get DATABASE_URL() {
-    const port = 8000 // Change this to your server port
-    return `http://localhost:${port}/data/restaurants.json`;
+    const port = 1337 // Change this to your server port
+    return `http://localhost:${port}/restaurants`;
   }
 
   /**
    * Fetch all restaurants.
    */
   static fetchRestaurants(callback) {
-    let xhr = new XMLHttpRequest();
+    fetch(DBHelper.DATABASE_URL)
+      .then(
+        function(response){
+          if (response.status !== 200){
+            console.log('There was a problem with status code: ' + response.status);
+            return;
+          }
+          response.json().then(function(data) {
+            console.log(data);
+            callback(null, data);
+          });
+        }
+      )
+      .catch(function(err){
+        console.log('Fetch error!', err);
+      })
+
+/*    let xhr = new XMLHttpRequest();
     xhr.open('GET', DBHelper.DATABASE_URL);
     xhr.onload = () => {
       if (xhr.status === 200) { // Got a success response from server!
@@ -29,6 +69,8 @@ class DBHelper {
       }
     };
     xhr.send();
+
+*/
   }
 
   /**
