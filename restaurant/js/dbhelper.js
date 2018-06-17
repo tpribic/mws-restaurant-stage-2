@@ -7,13 +7,13 @@ const DBVER = 1;
 (function() {
   'use strict';
 
-  //check for support
+//check for support
   if (!('indexedDB' in window)) {
     console.log('This browser doesn\'t support IndexedDB');
     return;
   }
 
-  var dbPromise = idb.open(DBNAME, DBVER, function (upgradeDb) {
+  let dbPromise = idb.open(DBNAME, DBVER, function (upgradeDb) {
     if (!upgradeDb.objectStoreNames.contains(KEY)) {
       upgradeDb.createObjectStore(KEY, { keyPath: 'id' });
     }
@@ -192,7 +192,7 @@ class DBHelper {
    * Restaurant image URL.
    */
   static imageUrlForRestaurant(restaurant) {
-    return (`/img/${restaurant.photograph}`);
+    return (`/img/${restaurant.photograph}.jpg`);
   }
 
   /**
