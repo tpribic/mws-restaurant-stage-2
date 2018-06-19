@@ -39,7 +39,6 @@ class DBHelper {
               const tx = db.transaction([KEY], 'readwrite');
               data.forEach(function (value){
                 tx.objectStore(KEY).put(value);
-                console.log(value);
               })
               return tx.complete;
             });
