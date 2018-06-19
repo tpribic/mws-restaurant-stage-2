@@ -4,22 +4,11 @@ const DBNAME = 'mws-stage2';
 const KEY = 'restaurants';
 const DBVER = 1;
 
-(function() {
-  'use strict';
 
-//check for support
-  if (!('indexedDB' in window)) {
-    console.log('This browser doesn\'t support IndexedDB');
-    return;
-  }
+const dbPromise = idb.open(DBNAME, DBVER, upgradeDB => {
+  upgradeDB.createObjectStore(KEY, {keyPath: 'id'});
+});
 
-  let dbPromise = idb.open(DBNAME, DBVER, function (upgradeDb) {
-    if (!upgradeDb.objectStoreNames.contains(KEY)) {
-      upgradeDb.createObjectStore(KEY, { keyPath: 'id' });
-    }
-  });
-
-})();
 
 /**
  * Common database helper functions.
@@ -40,14 +29,20 @@ class DBHelper {
    */
   static fetchRestaurants(callback) {
     fetch(DBHelper.DATABASE_URL)
-      .then(
-        function(response){
+      .then(function(response){
           if (response.status !== 200){
             console.log('There was a problem with status code: ' + response.status);
             return;
           }
           response.json().then(function(data) {
-            console.log(data);
+            dbPromise.then(db => {
+              const tx = db.transaction([KEY], 'readwrite');
+              data.forEach(function (value){
+                tx.objectStore(KEY).put(value);
+                console.log(value);
+              })
+              return tx.complete;
+            });
             callback(null, data);
           });
         }
