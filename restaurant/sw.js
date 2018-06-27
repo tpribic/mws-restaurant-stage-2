@@ -1,7 +1,7 @@
 function insertImages(){
   const images = [];
   for(let i=1; i<11; i++){
-    images.push(`./img/${i}.jpg`);
+    images.push(`./webp/${i}.webp`);
   }
   return images;
 }
@@ -12,6 +12,7 @@ self.addEventListener('install', function(event) {
       return cache.addAll(
         [
           '/',
+          '/manifest.json',
           '/index.html',
           '/restaurant.html',
           '/js/dbhelper.js',
